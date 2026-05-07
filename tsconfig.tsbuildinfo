@@ -1,0 +1,1 @@
+{"root":["./src/auth.ts","./src/global.d.ts","./src/main.tsx","./src/api/client.ts","./src/components/appshell.tsx","./src/pages/createrolepage.tsx","./src/pages/homepage.tsx","./src/pages/marketpage.tsx","./src/pages/mepage.tsx","./src/pages/messagespage.tsx","./src/pages/notedetailpage.tsx","./src/pages/roledetailpage.tsx","./src/pages/servicedetailpage.tsx"],"version":"6.0.3"}

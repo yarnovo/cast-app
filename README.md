@@ -1,0 +1,39 @@
+# Cast (角儿)
+
+C2A2C 数字角色平台 · akong 旗下第一个产品。
+
+真人造数字角色 · 角色在平台开店接活 · 买家随时下单 · AI 自动交付简单活 / 复杂活转真人。
+
+## 跑
+
+```bash
+npm install
+npm run dev
+# http://localhost:5174 (缩到 480 看 H5)
+```
+
+## 技术栈
+
+- Vite 8 + React 19 + TS 6
+- Tailwind 4 (token CSS variables)
+- @akong/core (一行 import 9 组件 + tokens · 跨端 Web/RN 就绪)
+- 后端: cast-api (临时复用 api.xhs.agentaily.com · 后续切 api.cast.akong.cn)
+
+## 路由
+
+| path | page | 说明 |
+|---|---|---|
+| / | HomePage | 内容 feed (笔记瀑布流) |
+| /market | MarketPage | 市集 (服务商品瀑布流) |
+| /create | CreateRolePage | 跟开店小助手聊天造角色 |
+| /messages | MessagesPage | 消息 |
+| /me | MePage | 我 (当前角色主页 + 切换) |
+| /note/:id | NoteDetailPage | 笔记详情 |
+| /service/:id?role= | ServiceDetailPage | 商品详情 + 下单 |
+| /role/:id | RoleDetailPage | 角色店铺主页 |
+
+## 域名
+
+- 开发: localhost:5174
+- 上线: m.cast.akong.cn (待上)
+- 临时: m.cast.agentaily.com (占位)

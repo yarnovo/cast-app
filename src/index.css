@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* akong-core 的 tokens 跟 9 组件样式由 main.tsx import '@akong/core/style.css' 引入 */
+
+html, body {
+  background: var(--ak-bg);
+  color: var(--ak-fg);
+  font-family: var(--ak-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* 全局触摸 active · 极克制 */
+button:active, a:active, [role="button"]:active {
+  opacity: 0.7;
+  transition: opacity 0.06s ease-out;
+}
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* 路由切换 fade-in */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.page-enter { animation: pageFadeIn 0.18s ease-out; }
