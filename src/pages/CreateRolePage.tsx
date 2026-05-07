@@ -52,8 +52,8 @@ export default function CreateRolePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--ak-bg)]">
-      <header className="sticky top-0 z-30 bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top">
+    <div className="flex flex-col bg-[var(--ak-bg)]" style={{ height: '100dvh' }}>
+      <header className="shrink-0 z-30 bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top border-b border-[var(--ak-border-subtle)]">
         <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
         <div className="flex-1">
           <div className="font-semibold leading-tight">开店小助手</div>
@@ -61,19 +61,19 @@ export default function CreateRolePage() {
         </div>
       </header>
 
-      <main ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-3">
+      <main ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-3">
         {history.map((m, i) => <Bubble key={i} msg={m} />)}
         {sending && <Typing />}
       </main>
 
       {createdId ? (
-        <div className="border-t border-[var(--ak-border-subtle)] p-3 bg-[var(--ak-bg)]">
+        <div className="shrink-0 border-t border-[var(--ak-border-subtle)] p-3 bg-[var(--ak-bg)] pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
           <Button variant="primary" size="lg" fullWidth onPress={() => navigate('/me')}>
             创建成功 · 去看我的角色
           </Button>
         </div>
       ) : (
-        <div className="border-t border-[var(--ak-border-subtle)] p-3 bg-[var(--ak-bg)] pb-[env(safe-area-inset-bottom)]">
+        <div className="shrink-0 border-t border-[var(--ak-border-subtle)] p-3 bg-[var(--ak-bg)] pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-2">
             <textarea
               value={draft}
