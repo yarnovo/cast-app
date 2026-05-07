@@ -1,18 +1,14 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { BottomNav } from '@akong/core'
+import { BottomNav, Home, ShoppingBag, Plus, MessageSquare, User } from '@akong/core'
 import type { ReactNode } from 'react'
 
 const items = [
-  { key: '/', label: '首页', icon: <NavIcon glyph="🏠" /> },
-  { key: '/market', label: '市集', icon: <NavIcon glyph="🛍" /> },
-  { key: '/create', label: '', icon: <NavIcon glyph="+" />, primary: true },
-  { key: '/messages', label: '消息', icon: <NavIcon glyph="💬" /> },
-  { key: '/me', label: '我', icon: <NavIcon glyph="👤" /> },
+  { key: '/', label: '首页', icon: <Home size={22} /> },
+  { key: '/market', label: '市集', icon: <ShoppingBag size={22} /> },
+  { key: '/create', label: '', icon: <Plus size={22} strokeWidth={2.2} />, primary: true },
+  { key: '/messages', label: '消息', icon: <MessageSquare size={22} /> },
+  { key: '/me', label: '我', icon: <User size={22} /> },
 ]
-
-function NavIcon({ glyph }: { glyph: string }) {
-  return <span style={{ fontSize: 20, lineHeight: 1 }}>{glyph}</span>
-}
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()

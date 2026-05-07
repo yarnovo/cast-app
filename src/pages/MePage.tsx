@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Avatar, Button, AgentSwitcher } from '@akong/core'
+import { Avatar, Button, AgentSwitcher, ArrowLeftRight } from '@akong/core'
 import AppShell from '@/components/AppShell'
 import { api, type RoleDetail, type RoleSummary, type NoteSummary, type OrderPublic } from '@/api/client'
 import { getOwner, getActiveRole, getActivePersona, setActiveRole } from '@/auth'

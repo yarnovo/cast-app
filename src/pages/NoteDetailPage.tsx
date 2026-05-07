@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Avatar, LazyImage } from '@akong/core'
+import { Avatar, LazyImage, ChevronLeft } from '@akong/core'
 import { api, type NoteDetail, type Comment } from '@/api/client'
 
 export default function NoteDetailPage() {
@@ -23,7 +23,7 @@ export default function NoteDetailPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--ak-bg)] pb-20">
       <header className="sticky top-0 z-30 bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top">
-        <button onClick={() => navigate(-1)} className="w-11 h-11 text-2xl">‹</button>
+        <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
         <Avatar src={note.author.avatar} name={note.author.name} size="sm" />
         <span className="flex-1 ml-2 font-medium text-[14px]">{note.author.name}</span>
         <button className="px-3 h-8 rounded-full bg-[var(--ak-accent)] text-[var(--ak-accent-fg)] text-[12px] font-medium">关注</button>

@@ -1,6 +1,6 @@
 import { useNavigate, useParams, useSearchParams, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Avatar, Button, LazyImage } from '@akong/core'
+import { Avatar, Button, LazyImage, ChevronLeft, MessageSquare } from '@akong/core'
 import { toast } from 'sonner'
 import { api, type RoleDetail, type ServicePublic } from '@/api/client'
 import { getMe } from '@/auth'
@@ -41,7 +41,7 @@ export default function ServiceDetailPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--ak-bg)] pb-20">
       <header className="sticky top-0 z-30 bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top">
-        <button onClick={() => navigate(-1)} className="w-11 h-11 text-2xl">‹</button>
+        <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
         <span className="flex-1 font-medium text-[15px]">商品详情</span>
       </header>
 
@@ -74,8 +74,8 @@ export default function ServiceDetailPage() {
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-[var(--ak-bg)] border-t border-[var(--ak-border-subtle)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center gap-3 px-4 py-3">
-          <button onClick={() => toast.info('客服功能即将上线')} className="flex flex-col items-center text-[10px] w-12 min-h-[44px] justify-center text-[var(--ak-fg-secondary)]">
-            <span className="text-[18px]">💬</span>
+          <button onClick={() => toast.info('客服功能即将上线')} aria-label="客服" className="flex flex-col items-center text-[10px] w-12 min-h-[44px] justify-center text-[var(--ak-fg-secondary)]">
+            <MessageSquare size={20} />
             <span className="mt-0.5">客服</span>
           </button>
           {role.owner_id === me ? (

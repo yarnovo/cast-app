@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { NoteCard, Skeleton } from '@akong/core'
+import { NoteCard, Skeleton, Search } from '@akong/core'
 import AppShell from '@/components/AppShell'
 import { api, type NoteSummary } from '@/api/client'
 
@@ -40,7 +40,7 @@ export default function HomePage() {
               </button>
             ))}
           </div>
-          <button aria-label="搜索" className="w-11 h-11 flex items-center justify-center text-[18px]">⌕</button>
+          <button aria-label="搜索" className="w-11 h-11 flex items-center justify-center text-[var(--ak-fg)]"><Search size={20} aria-label="搜索" /></button>
         </div>
       </header>
 

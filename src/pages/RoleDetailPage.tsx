@@ -1,6 +1,6 @@
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Avatar, ServiceCard, Button } from '@akong/core'
+import { Avatar, ServiceCard, Button, ChevronLeft } from '@akong/core'
 import { api, type RoleDetail } from '@/api/client'
 import { getMe } from '@/auth'
 
@@ -19,7 +19,7 @@ export default function RoleDetailPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--ak-bg)]">
       <header className="sticky top-0 z-30 bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top">
-        <button onClick={() => navigate(-1)} className="w-11 h-11 text-2xl">‹</button>
+        <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
         <span className="flex-1 font-medium text-[15px] truncate">{role.name}</span>
       </header>
 

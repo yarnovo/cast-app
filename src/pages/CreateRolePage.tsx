@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '@akong/core'
+import { Button, ChevronLeft, Send } from '@akong/core'
 import { toast } from 'sonner'
 import { api } from '@/api/client'
 import { getOwner, setActiveRole } from '@/auth'
@@ -54,7 +54,7 @@ export default function CreateRolePage() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--ak-bg)]">
       <header className="sticky top-0 z-30 bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top">
-        <button onClick={() => navigate(-1)} className="w-11 h-11 flex items-center justify-center text-2xl">‹</button>
+        <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
         <div className="flex-1">
           <div className="font-semibold leading-tight">开店小助手</div>
           <div className="text-[11px] text-[var(--ak-fg-secondary)]">聊几句帮你造数字角色</div>
@@ -92,7 +92,7 @@ export default function CreateRolePage() {
               rows={1}
               className="flex-1 max-h-32 min-h-[44px] px-3 py-2 bg-[var(--ak-bg-subtle)] rounded-2xl text-[14px] outline-none resize-none"
             />
-            <Button variant="primary" size="md" disabled={sending || !draft.trim()} onPress={send}>
+            <Button variant="primary" size="md" disabled={sending || !draft.trim()} onPress={send} iconLeft={<Send size={16} />}>
               发送
             </Button>
           </div>
