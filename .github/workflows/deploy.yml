@@ -37,20 +37,17 @@ jobs:
 
       - name: install ossutil
         run: |
-          curl -sLo ossutil.zip https://gosspublic.alicdn.com/ossutil/v2/2.0.7/ossutil-2.0.7-linux-amd64.zip
-          unzip -q ossutil.zip
-          sudo mv ossutil-*/ossutil /usr/local/bin/ossutil
-          ossutil version
+          curl -sLo /tmp/ossutil https://gosspublic.alicdn.com/ossutil/1.7.18/ossutil64
+          chmod +x /tmp/ossutil
+          sudo mv /tmp/ossutil /usr/local/bin/ossutil
+          ossutil --version
 
       - name: sync to oss
-        env:
-          OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_AK }}
-          OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_SK }}
-          OSS_REGION: cn-hangzhou
         run: |
-          ossutil sync dist/ "oss://${{ steps.env.outputs.bucket }}/" \
-            --delete \
-            -e oss-cn-hangzhou.aliyuncs.com
+          ossutil -i "${{ secrets.ALIYUN_AK }}" -k "${{ secrets.ALIYUN_SK }}" \
+            -e oss-cn-hangzhou.aliyuncs.com \
+            sync dist/ "oss://${{ steps.env.outputs.bucket }}/" \
+            --delete
 
       - name: summary
         run: |
