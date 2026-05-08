@@ -27,22 +27,8 @@ jobs:
       - name: install
         run: npm install --no-audit --no-fund
 
-      - name: debug · verify chat-layout css fetched
-        run: |
-          echo "=== chat-layout/src/ChatLayout.css ==="
-          head -20 node_modules/@akong/chat-layout/src/ChatLayout.css
-          echo "=== chat-input/src/ChatInput.css ==="
-          head -20 node_modules/@akong/chat-input/src/ChatInput.css
-          echo "=== sticky in installed chat-layout ==="
-          grep -c "position: sticky\|position:sticky" node_modules/@akong/chat-layout/src/ChatLayout.css || true
-
       - name: build
         run: npm run build
-
-      - name: debug · verify dist css
-        run: |
-          echo "=== sticky in dist ==="
-          grep -c "position:sticky" dist/assets/*.css || echo "0 occurrences"
 
       - name: pick env
         id: env
@@ -67,6 +53,7 @@ jobs:
           ossutil -i "${{ secrets.ALIYUN_AK }}" -k "${{ secrets.ALIYUN_SK }}" \
             -e oss-cn-hangzhou.aliyuncs.com \
             sync dist/ "oss://${{ steps.env.outputs.bucket }}/" \
+            -f \
             --delete
 
       - name: summary
