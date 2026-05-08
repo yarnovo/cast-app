@@ -3,3 +3,8 @@ dist
 .DS_Store
 *.local
 .vite
+
+# playwright e2e
+test-results/
+playwright-report/
+node_modules/.cache/

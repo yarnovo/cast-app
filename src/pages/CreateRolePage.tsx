@@ -61,7 +61,10 @@ export default function CreateRolePage() {
   }
 
   const header = (
-    <header className="bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top border-b border-[var(--ak-border-subtle)]">
+    <header
+      data-testid="create-role-header"
+      className="bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top border-b border-[var(--ak-border-subtle)]"
+    >
       <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
       <div className="flex-1">
         <div className="font-semibold leading-tight">角色助手</div>
@@ -72,18 +75,22 @@ export default function CreateRolePage() {
 
   const footer = createdId ? (
     <div className="p-3 bg-[var(--ak-bg)] pb-[calc(0.75rem+env(safe-area-inset-bottom))] border-t border-[var(--ak-border-subtle)]">
-      <Button variant="primary" size="lg" fullWidth onPress={() => navigate('/me')}>
-        创建成功 · 去看我的角色
-      </Button>
+      <div data-testid="go-to-me-btn">
+        <Button variant="primary" size="lg" fullWidth onPress={() => navigate('/me')}>
+          创建成功 · 去看我的角色
+        </Button>
+      </div>
     </div>
   ) : (
-    <ChatInput
-      value={draft}
-      onChange={setDraft}
-      onSend={send}
-      disabled={sending}
-      placeholder="说说你想造什么角色..."
-    />
+    <div data-testid="chat-input">
+      <ChatInput
+        value={draft}
+        onChange={setDraft}
+        onSend={send}
+        disabled={sending}
+        placeholder="说说你想造什么角色..."
+      />
+    </div>
   )
 
   return (
@@ -95,7 +102,9 @@ export default function CreateRolePage() {
       >
         <div className="px-3 py-4 space-y-3">
           {history.map((m, i) => (
-            <ChatBubble key={i} role={m.role} content={m.content} />
+            <div key={i} data-testid={`bubble-${i}`}>
+              <ChatBubble role={m.role} content={m.content} />
+            </div>
           ))}
           {sending && (
             <div className="flex justify-start">
