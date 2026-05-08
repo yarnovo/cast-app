@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ServiceCard, Skeleton, Search } from '@akong/core'
 import AppShell from '@/components/AppShell'
 import { api, type RoleSummary, type ServicePublic } from '@/api/client'
 
-const TABS = ['推荐', '设计', '心理', '编程'] as const
-type Tab = typeof TABS[number]
+const TABS = ['关注', '推荐', '同城'] as const
+type Tab = (typeof TABS)[number]
 
 type Item = { service: ServicePublic; role: RoleSummary }
+
+// 推荐排序 v1: 简单 score (服务包数 + 随机噪声) · 后端没 score 字段时前端兜底
+const recommendScore = (it: Item) => it.role.services_count * 2 + Math.random() * 5
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -24,6 +27,16 @@ export default function HomePage() {
       .finally(() => alive && setLoading(false))
     return () => { alive = false }
   }, [])
+
+  // 按 tab 选不同子集 / 排序
+  const visible = useMemo(() => {
+    if (tab === '推荐') {
+      return [...items].sort((a, b) => recommendScore(b) - recommendScore(a))
+    }
+    if (tab === '关注') return [] // 后端没 follow filter · 暂留空
+    if (tab === '同城') return [] // 后端没 location filter · 暂留空
+    return items
+  }, [items, tab])
 
   return (
     <AppShell>
@@ -56,13 +69,15 @@ export default function HomePage() {
               <Skeleton key={i} height={220} radius="lg" />
             ))}
           </div>
-        ) : items.length === 0 ? (
+        ) : visible.length === 0 ? (
           <div className="text-center text-sm text-[var(--ak-fg-tertiary)] py-12">
-            还没有虚拟角色 · 跟角色助手聊几句造一个
+            {tab === '关注' && '还没关注任何人 · 去推荐看看'}
+            {tab === '同城' && '还没有同城内容'}
+            {tab === '推荐' && '还没有虚拟角色 · 跟角色助手聊几句造一个'}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2.5">
-            {items.map(({ service, role }) => (
+            {visible.map(({ service, role }) => (
               <ServiceCard
                 key={`${role.id}-${service.id}`}
                 id={String(service.id)}
