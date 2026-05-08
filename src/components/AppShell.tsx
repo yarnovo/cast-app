@@ -3,15 +3,14 @@ import { BottomNav, Home, ShoppingBag, MessageSquare, User } from '@akong/core'
 import type { ReactNode } from 'react'
 
 /**
- * BottomNav (REQ-004 · 5-9 老板拍 v3)
+ * BottomNav (REQ-005 · 5-9 老板拍 v4)
  *
- * 砍掉中间 `/create` ➕ 号 · 造 agent 通过跟阿空小造对话 (默认 `/` 路由 ChatPage)。
- * 4 个 tab: 对话(/) · 市集(/market) · 消息(/messages) · 我(/me)。
- *
- * HomePage feed 路由保留在 `/home` (不进 BottomNav · 老 link / 内部跳转可达 · 保留代码避免砍页面)。
+ * 4 tab · 砍中间 ➕ (老板拍 · 造 agent 通过对话不需要按钮)。
+ * "我" tab 路由 /me 现在 render ChatPage (跟阿空小造对话) · 不再是 user profile。
+ * 其他 3 tab (首页 / 市集 / 消息) 不动。
  */
 const items = [
-  { key: '/', label: '对话', icon: <Home size={22} />, primary: true },
+  { key: '/', label: '首页', icon: <Home size={22} /> },
   { key: '/market', label: '市集', icon: <ShoppingBag size={22} /> },
   { key: '/messages', label: '消息', icon: <MessageSquare size={22} /> },
   { key: '/me', label: '我', icon: <User size={22} /> },
