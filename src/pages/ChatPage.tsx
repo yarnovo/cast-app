@@ -169,11 +169,11 @@ export default function ChatPage() {
     </div>
   )
 
-  // 注: ChatLayout 自身是 flex-col 100% 高度 · 外层固定到视口减去 BottomNav (h-14 = 56px)。
-  // 用 fixed 而非 inset-0 直接铺 · 避免覆盖 BottomNav。
+  // ChatLayout 自身是 flex-col 100% 高度 · 占据 AppShell main 剩余空间 (pb-14 留给 BottomNav)。
+  // 不用 fixed · 让 BottomNav 真显示 (老板 5-9 抓 · fixed top-0 盖 BottomNav 教训)。
   return (
     <AppShell>
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] h-[calc(100vh-3.5rem)] z-30">
+      <div className="mx-auto w-full max-w-[480px] h-[calc(100vh-3.5rem)] flex flex-col">
         <ChatLayout
           header={header}
           footer={footer}
