@@ -1,0 +1,62 @@
+name: deploy
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: install
+        run: npm install --no-audit --no-fund
+
+      - name: build
+        run: npm run build
+
+      - name: pick env
+        id: env
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "bucket=agentaily-cast-app" >> $GITHUB_OUTPUT
+            echo "label=prod" >> $GITHUB_OUTPUT
+          else
+            echo "bucket=agentaily-cast-app-staging" >> $GITHUB_OUTPUT
+            echo "label=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: install ossutil
+        run: |
+          curl -sLo ossutil.zip https://gosspublic.alicdn.com/ossutil/v2/2.0.7/ossutil-2.0.7-linux-amd64.zip
+          unzip -q ossutil.zip
+          sudo mv ossutil-*/ossutil /usr/local/bin/ossutil
+          ossutil version
+
+      - name: sync to oss
+        env:
+          OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_AK }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_SK }}
+          OSS_REGION: cn-hangzhou
+        run: |
+          ossutil sync dist/ "oss://${{ steps.env.outputs.bucket }}/" \
+            --delete \
+            -e oss-cn-hangzhou.aliyuncs.com
+
+      - name: summary
+        run: |
+          echo "deployed ${{ steps.env.outputs.label }} to oss://${{ steps.env.outputs.bucket }}/" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.env.outputs.label }}" = "prod" ]; then
+            echo "https://m.cast.agentaily.com/" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "https://staging.m.cast.agentaily.com/" >> $GITHUB_STEP_SUMMARY
+          fi
