@@ -46,7 +46,11 @@ test('阿空小造 · 聊天列表置顶 → 单聊天页多轮真续上', async
   })
 
   // 1. /messages 列表 · pinned-meta-xiaozao 在
-  await page.goto('/messages')
+  // 注: 走 / + BottomNav 点击 (用户真实路径) · 不直接 goto('/messages') —
+  // OSS 静态托管 SPA 子路由需 error_doc=index.html · 当前 staging/prod bucket 暂无此设置 ·
+  // 用户用 BottomNav 走 client-side routing 没问题。
+  await page.goto('/')
+  await page.getByText('消息', { exact: true }).click()
   const pinned = page.getByTestId('pinned-meta-xiaozao')
   await expect(pinned).toBeVisible()
   await expect(pinned).toContainText('阿空小造')
@@ -99,8 +103,11 @@ test('阿空小造 · 聊天列表置顶 → 单聊天页多轮真续上', async
   expect(new Set(sids).size, '所有请求同 session_id').toBe(1)
   expect(sids[0]).toBe(sid1)
 
-  // 7. session_id 跨刷新不丢
-  await page.reload()
+  // 7. session_id 跨页持久化 (回 / · 重新点 BottomNav + pinned · 应续上同 sid)
+  // 注: 不用 page.reload() · OSS 静态托管 SPA 子路由 (`/messages/:agentId`) 直接 reload 会 404
+  await page.goto('/')
+  await page.getByText('消息', { exact: true }).click()
+  await page.getByTestId('pinned-meta-xiaozao').click()
   await expect(page.getByTestId('session-indicator')).toContainText(sid1!.slice(0, 8))
 
   // 8. 重开: session_id 换 · history 清 (INTRO 重出 · turn1/2 消失)
