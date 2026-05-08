@@ -9,7 +9,6 @@ import ChatPage from './pages/ChatPage'
 import HomePage from './pages/HomePage'
 import MarketPage from './pages/MarketPage'
 import MessagesPage from './pages/MessagesPage'
-import MePage from './pages/MePage'
 import ServiceDetailPage from './pages/ServiceDetailPage'
 import RoleDetailPage from './pages/RoleDetailPage'
 import './auth'
@@ -38,11 +37,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <div className="mx-auto max-w-[480px] min-h-screen bg-[var(--ak-bg)] text-[var(--ak-fg)] relative">
         <PageTransition>
           <Routes>
-            <Route path="/" element={<ChatPage />} />
-            <Route path="/home" element={<HomePage />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/market" element={<MarketPage />} />
             <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/me" element={<MePage />} />
+            <Route path="/me" element={<ChatPage />} />
             <Route path="/service/:id" element={<ServiceDetailPage />} />
             <Route path="/role/:id" element={<RoleDetailPage />} />
           </Routes>
