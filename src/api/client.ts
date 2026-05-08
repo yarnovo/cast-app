@@ -8,38 +8,7 @@ export type User = {
   name: string
   avatar: string
   bio: string
-  followers: number
-  following: number
 }
-
-export type NoteSummary = {
-  id: string
-  title: string
-  cover: string
-  ratio: number
-  likes: number
-  author: User
-}
-
-export type NoteDetail = NoteSummary & {
-  content: string
-  images: string[]
-  tags: string[]
-  collects: number
-  comments_count: number
-  created_at: string
-}
-
-export type Comment = {
-  id: string
-  content: string
-  likes: number
-  created_at: string
-  author: User
-}
-
-export type FeedResponse = { items: NoteSummary[]; next_cursor: string | null }
-export type ToggleResponse = { active: boolean; count: number }
 
 export type ServicePublic = {
   id: number
@@ -111,23 +80,9 @@ async function agentReq<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  // notes (内容 feed)
-  feed: (cursor?: string | null, limit = 20) => {
-    const q = new URLSearchParams()
-    if (cursor) q.set('cursor', cursor)
-    q.set('limit', String(limit))
-    return req<FeedResponse>(`/api/notes?${q}`)
-  },
-  note: (id: string) => req<NoteDetail>(`/api/notes/${id}`),
-  comments: (id: string) => req<Comment[]>(`/api/notes/${id}/comments`),
-  postComment: (id: string, content: string) =>
-    req<Comment>(`/api/notes/${id}/comments`, { method: 'POST', body: JSON.stringify({ content }) }),
-  toggleLike: (id: string) => req<ToggleResponse>(`/api/notes/${id}/like`, { method: 'POST' }),
-  toggleCollect: (id: string) => req<ToggleResponse>(`/api/notes/${id}/collect`, { method: 'POST' }),
   user: (id: string) => req<User>(`/api/users/${id}`),
-  userNotes: (id: string) => req<NoteSummary[]>(`/api/users/${id}/notes`),
 
-  // roles (虚拟角色市场 · 服务端表名仍是 agents · 字段映射就行)
+  // 虚拟角色市集 · 服务端表名仍是 agents · 字段映射
   marketRoles: (q?: string, limit = 30) => {
     const u = new URLSearchParams()
     if (q) u.set('q', q)
@@ -137,7 +92,7 @@ export const api = {
   roleDetail: (id: string) => req<RoleDetail>(`/api/agents/${id}`),
   myRoles: (ownerId: string) => req<RoleSummary[]>(`/api/agents/mine?owner_id=${ownerId}`),
 
-  // services flat list 给市集页
+  // 服务包扁平列表 · 给市集页 (要先取所有角色再展开 services)
   marketServices: async (q?: string): Promise<{ service: ServicePublic; role: RoleSummary }[]> => {
     const roles = await api.marketRoles(q, 30)
     const flat: { service: ServicePublic; role: RoleSummary }[] = []
@@ -149,7 +104,7 @@ export const api = {
     return flat
   },
 
-  // orders
+  // 订单
   createOrder: (buyerId: string, agentId: string, serviceId: number, requirements = '') =>
     req<OrderPublic>(`/api/orders?buyer_id=${buyerId}`, {
       method: 'POST',
@@ -158,7 +113,7 @@ export const api = {
   payOrder: (orderId: string) => req<OrderPublic>(`/api/orders/${orderId}/pay`, { method: 'POST' }),
   myOrders: (userId: string) => req<OrderPublic[]>(`/api/orders/mine?user_id=${userId}`),
 
-  // meta-agent (创角色对话)
+  // 阿空小造 · 跟用户聊几句帮造虚拟角色
   metaChat: (ownerId: string, history: { role: string; content: string }[], message: string) =>
     agentReq<MetaChatResponse>('/api/meta-agent/chat', {
       method: 'POST',

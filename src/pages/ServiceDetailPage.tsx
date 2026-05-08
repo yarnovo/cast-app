@@ -67,7 +67,7 @@ export default function ServiceDetailPage() {
         <Avatar src={role.persona.avatar} name={role.name} size="md" />
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-medium truncate">{role.name}</div>
-          <div className="text-[12px] text-[var(--ak-fg-tertiary)] mt-0.5">{role.persona.followers || 0} 粉丝 · {role.services_count} 件商品</div>
+          <div className="text-[12px] text-[var(--ak-fg-tertiary)] mt-0.5">{role.services_count} 件服务</div>
         </div>
         <Button variant="secondary" size="sm">进店</Button>
       </Link>

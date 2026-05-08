@@ -10,7 +10,6 @@ import MarketPage from './pages/MarketPage'
 import CreateRolePage from './pages/CreateRolePage'
 import MessagesPage from './pages/MessagesPage'
 import MePage from './pages/MePage'
-import NoteDetailPage from './pages/NoteDetailPage'
 import ServiceDetailPage from './pages/ServiceDetailPage'
 import RoleDetailPage from './pages/RoleDetailPage'
 import './auth'
@@ -44,7 +43,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/create" element={<CreateRolePage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/me" element={<MePage />} />
-            <Route path="/note/:id" element={<NoteDetailPage />} />
             <Route path="/service/:id" element={<ServiceDetailPage />} />
             <Route path="/role/:id" element={<RoleDetailPage />} />
           </Routes>

@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Avatar, Button, AgentSwitcher, ArrowLeftRight } from '@akong/core'
+import { Avatar, Button, AgentSwitcher } from '@akong/core'
 import AppShell from '@/components/AppShell'
-import { api, type RoleDetail, type RoleSummary, type NoteSummary, type OrderPublic } from '@/api/client'
+import { api, type RoleDetail, type RoleSummary, type OrderPublic } from '@/api/client'
 import { getOwner, getActiveRole, getActivePersona, setActiveRole } from '@/auth'
 
-const TABS = ['作品', '收藏', '赞过'] as const
+const TABS = ['服务', '订单'] as const
 type Tab = typeof TABS[number]
 
 export default function MePage() {
@@ -15,9 +15,8 @@ export default function MePage() {
   const personaId = getActivePersona()
   const [role, setRole] = useState<RoleDetail | null>(null)
   const [allRoles, setAllRoles] = useState<RoleSummary[]>([])
-  const [notes, setNotes] = useState<NoteSummary[]>([])
   const [orders, setOrders] = useState<OrderPublic[]>([])
-  const [tab, setTab] = useState<Tab>('作品')
+  const [tab, setTab] = useState<Tab>('服务')
   const [switcherOpen, setSwitcherOpen] = useState(false)
   const [needPick, setNeedPick] = useState(false)
 
@@ -31,7 +30,6 @@ export default function MePage() {
     }
     api.roleDetail(activeId).then(setRole).catch(() => setRole(null))
     api.myRoles(owner).then(setAllRoles).catch(() => {})
-    if (personaId) api.userNotes(personaId).then(setNotes).catch(() => {})
     api.myOrders(personaId || owner).then(setOrders).catch(() => {})
   }, [activeId, owner, personaId])
 
@@ -63,9 +61,9 @@ export default function MePage() {
         </div>
 
         <div className="flex items-center gap-7 mt-6">
-          <Stat label="关注" value={role.persona.following || 0} />
-          <Stat label="粉丝" value={role.persona.followers || 0} />
+          <Stat label="服务" value={role.services.length} />
           <Stat label="订单" value={orders.length} />
+          <Stat label="状态" valueText={role.status === 'active' ? '在售' : role.status} />
         </div>
 
         <div className="flex gap-2 mt-5">
@@ -91,21 +89,42 @@ export default function MePage() {
         </div>
       </div>
 
-      <div className="px-2 pt-2">
-        {tab === '作品' && (notes.length === 0 ? <Empty hint="还没有作品 · 角色 wakeup 后会自动发" /> : (
-          <div className="columns-2 gap-2.5">
-            {notes.map((n) => (
-              <Link key={n.id} to={`/note/${n.id}`} className="block break-inside-avoid mb-2.5">
-                <div className="rounded-xl overflow-hidden bg-[var(--ak-bg-subtle)]">
-                  <img src={n.cover} alt="" className="w-full block" style={{ aspectRatio: `1 / ${n.ratio}` }} />
+      <div className="px-3 pt-3 pb-6">
+        {tab === '服务' && (role.services.length === 0 ? <Empty hint="还没上架服务包" /> : (
+          <div className="space-y-2.5">
+            {role.services.map((s) => (
+              <Link
+                key={s.id}
+                to={`/service/${s.id}?role=${role.id}`}
+                className="block p-3 rounded-xl bg-[var(--ak-bg-subtle)]"
+              >
+                <div className="flex items-baseline justify-between gap-3">
+                  <div className="font-medium text-[14px] truncate">{s.title}</div>
+                  <div className="text-[14px] font-semibold tracking-tight shrink-0">¥{(s.price_cents / 100).toFixed(0)}</div>
                 </div>
-                <div className="px-1 pt-2 text-[13px] line-clamp-2">{n.title}</div>
+                <div className="text-[12px] text-[var(--ak-fg-tertiary)] mt-1 line-clamp-2">{s.description}</div>
+                <div className="text-[11px] text-[var(--ak-fg-tertiary)] mt-1.5">
+                  {s.sla_hours}h 交付 · {s.mode === 'ai' ? 'AI' : s.mode === 'human' ? '真人' : 'AI + 真人'}
+                </div>
               </Link>
             ))}
           </div>
         ))}
-        {tab === '收藏' && <Empty hint="还没收藏" />}
-        {tab === '赞过' && <Empty hint="还没赞过" />}
+        {tab === '订单' && (orders.length === 0 ? <Empty hint="还没有订单" /> : (
+          <div className="space-y-2.5">
+            {orders.map((o) => (
+              <div key={o.id} className="p-3 rounded-xl bg-[var(--ak-bg-subtle)]">
+                <div className="flex items-baseline justify-between gap-3">
+                  <div className="text-[14px] truncate">订单 {o.id.slice(0, 8)}</div>
+                  <div className="text-[14px] font-semibold">¥{(o.price_cents / 100).toFixed(0)}</div>
+                </div>
+                <div className="text-[11px] text-[var(--ak-fg-tertiary)] mt-1">
+                  {o.status} · {new Date(o.created_at).toLocaleString('zh-CN')}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
 
       <AgentSwitcher
@@ -124,10 +143,10 @@ export default function MePage() {
   )
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({ label, value, valueText }: { label: string; value?: number; valueText?: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-[18px] font-semibold tracking-tight leading-tight">{value}</span>
+      <span className="text-[18px] font-semibold tracking-tight leading-tight">{valueText ?? value ?? 0}</span>
       <span className="text-[12px] text-[var(--ak-fg-secondary)] mt-0.5">{label}</span>
     </div>
   )

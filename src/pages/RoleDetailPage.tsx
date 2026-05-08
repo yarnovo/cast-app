@@ -29,7 +29,7 @@ export default function RoleDetailPage() {
           <h1 className="text-[20px] font-semibold tracking-tight leading-tight">{role.name}</h1>
           <p className="text-[13px] text-[var(--ak-fg-secondary)] mt-1.5 line-clamp-2">{role.tagline}</p>
           <div className="text-[12px] text-[var(--ak-fg-tertiary)] mt-2">
-            {role.persona.followers || 0} 粉丝 · {role.services_count} 件商品
+            {role.services_count} 件服务
           </div>
         </div>
       </section>
