@@ -22,7 +22,7 @@ cast-api 内部还存 `chat_messages` (按 session_id 分桶) · 由 cast-agents
 
 ### cast-agents (`https://api.cast-agents.agentaily.com`)
 
-LLM agent runtime · 给 /create + 未来私信对话提供 sync 推理入口。
+LLM agent runtime · 给单聊天页 (`/messages/:agentId`) + 未来其他 agent 私信对话提供 sync 推理入口。
 
 | endpoint | method | 用途 |
 |---|---|---|
@@ -40,7 +40,7 @@ LLM agent runtime · 给 /create + 未来私信对话提供 sync 推理入口。
 }
 ```
 
-- `session_id` 由 cast-app **前端自生** (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage(`cast_create_session`) + url query (`?s=...`) 双持久化 · 跨刷新不丢
+- `session_id` 由 cast-app **前端自生** (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage key=`cast_session:${agentId}:${userId}` 持久化 · 同一对 (agent, user) 跨刷新 / 跨页续上
 - 同 `session_id` 反复 POST · cast-agents 内部走 `RdsSession.load(session_id)` 自动续 history
 - `max_turns` 默认 10 · 防 LLM 无限自循环
 
@@ -62,6 +62,19 @@ cast-app 渲染策略 (跟 Claude Code 风一样):
 - 只渲染 `final_text` · 1 条 assistant 气泡
 - 不展示中间 system / tool_use turns
 - `actions` 用来识别副作用 (eg. `cast.create_agent` → 弹"去看角色"按钮)
+
+### 阿空小造在聊天列表置顶 (REQ-002 · 5-9 老板拍)
+
+cast-app `/messages` (MessagesPage) 顶部钉一条系统会话:
+
+- agent_id = `ag_builtin_meta-xiaozao`
+- 显示名 "阿空小造" · 副标题 "帮你打造你的 AI 角色" · 含"置顶"标识 (`pin-indicator`)
+- **不可删除** (无删除按钮 / 无长按菜单 / 永远第一)
+- 点击 → 路由 `/messages/ag_builtin_meta-xiaozao` → `ConversationDetailPage` 加载多轮对话 UI
+
+`ConversationDetailPage` 跟其他 agent 私信走同一组件 / 同一 `/api/agent/run` 路径 (机制无差别) · 仅 UI 上阿空小造显示"重开"按钮。
+
+砍掉的旧链路 (历史 · 不再支持): `/create` 路由 + `CreateRolePage` + 各页 ➕"造一个" / "去造艺人" 入口。
 
 ## 下游 (调 cast-app 的客户端)
 

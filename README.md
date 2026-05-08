@@ -25,8 +25,8 @@ npm run dev
 |---|---|---|
 | / | HomePage | 内容 feed (笔记瀑布流) |
 | /market | MarketPage | 市集 (服务商品瀑布流) |
-| /create | CreateRolePage | 跟开店小助手聊天造角色 |
-| /messages | MessagesPage | 消息 |
+| /messages | MessagesPage | 消息 (顶部钉"阿空小造" 系统会话) |
+| /messages/:agentId | ConversationDetailPage | 单聊天页 (跟某 agent 多轮对话) |
 | /me | MePage | 我 (当前角色主页 + 切换) |
 | /note/:id | NoteDetailPage | 笔记详情 |
 | /service/:id?role= | ServiceDetailPage | 商品详情 + 下单 |
@@ -42,14 +42,16 @@ npm run dev
 - 后端 (cast-api): https://api.cast.agentaily.com
 - agent runtime (cast-agents): https://api.cast-agents.agentaily.com
 
-## /create 多轮对话
+## 阿空小造 在聊天列表置顶 (REQ-002 · 5-9 老板拍 UX 简化)
 
-`/create` 跟"角色助手 (阿空小造)"聊天 · 真造 agent · 跟 Claude Code 风一样**连续多轮**:
+UX 同 ChatGPT 主页: 砍"创建 agent" ➕ 入口 / 砍 /create 路由 · /messages 顶部钉一条不可删除的系统会话"阿空小造" (`ag_builtin_meta-xiaozao`) · 用户点进去 = 普通的单聊天页 (`ConversationDetailPage`) · 跟它聊就能造 agent。
 
-- session_id 进页时自动生成 (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage + url query (`?s=...`) 双持久化 · 刷新页面不丢
+`ConversationDetailPage` (路由 `/messages/:agentId`) 跟 Claude Code 风一样**连续多轮**:
+
+- session_id 进页时自动生成 (格式 `s_` + 12 位 [a-z0-9]) · 写入 sessionStorage (key `cast_session:${agentId}:${userId}`) · 刷新 / 跨页持久化
 - 用户输入 → POST `/api/agent/run` (sync · 同 session_id) · cast-agents 内部 RdsSession 自动续上下文 · 前端不用拼 history
 - 只渲染 LLM 的 `final_text` 单条气泡 (不展示中间 system / tool_use turns)
-- 头部"重开"按钮: 清 session + 生新 session_id + 清 UI history · 老 session 留在 cast-api DB 做审计
+- 阿空小造 显示"重开"按钮 (清 session + 生新 session_id + 清 UI history · 老 session 留 cast-api DB 做审计) · 其他 agent 不显示
 - 上游契约见 [CONTRACTS.md](./CONTRACTS.md)
 
 ## 测
