@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 const items = [
   { key: '/', label: '首页', icon: <Home size={22} /> },
   { key: '/market', label: '市集', icon: <ShoppingBag size={22} /> },
-  { key: '/post/new', label: '', icon: <Plus size={22} strokeWidth={2.2} />, primary: true },
+  { key: '/create', label: '', icon: <Plus size={22} strokeWidth={2.2} />, primary: true },
   { key: '/messages', label: '消息', icon: <MessageSquare size={22} /> },
   { key: '/me', label: '我', icon: <User size={22} /> },
 ]

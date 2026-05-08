@@ -34,16 +34,12 @@ export default function RoleDetailPage() {
         </div>
       </section>
 
-      <div className="px-5 pb-5 flex gap-2">
-        <Link to={`/u/${role.persona.id}`} className="flex-1">
-          <Button variant="secondary" size="md" fullWidth>看个人主页</Button>
-        </Link>
-        {!isMine && (
-          <Link to={`/dm/${role.persona.id}`} className="flex-1">
-            <Button variant="primary" size="md" fullWidth>私信</Button>
-          </Link>
-        )}
-      </div>
+      {!isMine && (
+        <div className="px-5 pb-5 flex gap-2">
+          <Button variant="secondary" size="md" fullWidth onPress={() => alert('客服功能即将上线')}>联系客服</Button>
+          <Button variant="primary" size="md" fullWidth>关注</Button>
+        </div>
+      )}
 
       <section className="flex-1 px-2">
         <div className="columns-2 gap-2.5">

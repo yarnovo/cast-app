@@ -8,7 +8,6 @@ export type User = {
   name: string
   avatar: string
   bio: string
-  location?: string | null
 }
 
 export type ServicePublic = {
@@ -60,43 +59,6 @@ export type MetaChatResponse = {
   reply: string
   created_agent_id: string | null
   done: boolean
-}
-
-/** 帖子 · 任何 user (真人 owner / agent persona) 都能发 */
-export type PostPublic = {
-  id: string
-  author: User
-  content: string
-  images: string[]
-  location: string | null
-  likes: number
-  created_at: string
-  is_liked: boolean
-  is_following_author: boolean
-}
-
-export type UserStats = {
-  posts_count: number
-  followers_count: number
-  following_count: number
-}
-
-export type FeedType = 'recommend' | 'follow' | 'nearby'
-
-/** 私信 inbox 项 · cast-api 现有 /api/messages 协议 */
-export type InboxItem = {
-  user: User
-  last_message: string
-  last_at: string
-  unread: number
-}
-
-export type DMessage = {
-  id: string
-  sender_id: string
-  receiver_id: string
-  content: string
-  created_at: string
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -156,65 +118,5 @@ export const api = {
     agentReq<MetaChatResponse>('/api/meta-agent/chat', {
       method: 'POST',
       body: JSON.stringify({ owner_id: ownerId, history, message }),
-    }),
-
-  // === 帖子 (post) · 真人 / agent persona 通用 ===
-  createPost: (
-    authorId: string,
-    body: { content: string; images?: string[]; location?: string | null },
-  ) =>
-    req<PostPublic>(`/api/posts?author_id=${encodeURIComponent(authorId)}`, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }),
-  getPost: (postId: string, viewerId: string) =>
-    req<PostPublic>(`/api/posts/${postId}?viewer_id=${encodeURIComponent(viewerId)}`),
-  deletePost: (postId: string, authorId: string) =>
-    req<{ ok: true }>(`/api/posts/${postId}?author_id=${encodeURIComponent(authorId)}`, {
-      method: 'DELETE',
-    }),
-  likePost: (postId: string, userId: string) =>
-    req<{ liked: boolean; likes: number }>(
-      `/api/posts/${postId}/like?user_id=${encodeURIComponent(userId)}`,
-      { method: 'POST' },
-    ),
-
-  // === 关注 / 关系 ===
-  follow: (followerId: string, followeeId: string) =>
-    req<{ following: boolean }>(
-      `/api/follow?follower_id=${encodeURIComponent(followerId)}&followee_id=${encodeURIComponent(followeeId)}`,
-      { method: 'POST' },
-    ),
-  followers: (userId: string) => req<User[]>(`/api/users/${userId}/followers`),
-  following: (userId: string) => req<User[]>(`/api/users/${userId}/following`),
-  userStats: (userId: string) => req<UserStats>(`/api/users/${userId}/stats`),
-
-  // === 个人主页帖子流 ===
-  userPosts: (userId: string, viewerId: string, limit = 30) =>
-    req<PostPublic[]>(
-      `/api/users/${userId}/posts?viewer_id=${encodeURIComponent(viewerId)}&limit=${limit}`,
-    ),
-
-  // === 首页 feed (关注 / 推荐 / 同城) ===
-  feed: (type: FeedType, userId: string, limit = 30, cursor?: string) => {
-    const u = new URLSearchParams()
-    u.set('type', type)
-    u.set('user_id', userId)
-    u.set('limit', String(limit))
-    if (cursor) u.set('cursor', cursor)
-    return req<PostPublic[]>(`/api/feed?${u}`)
-  },
-
-  // === 私信 (cast-api 现有 /api/messages) ===
-  inbox: (userId: string) =>
-    req<InboxItem[]>(`/api/messages/inbox?user_id=${encodeURIComponent(userId)}`),
-  dmHistory: (userId: string, otherUserId: string) =>
-    req<DMessage[]>(
-      `/api/messages/with/${encodeURIComponent(otherUserId)}?user_id=${encodeURIComponent(userId)}`,
-    ),
-  sendDM: (senderId: string, receiverId: string, content: string) =>
-    req<DMessage>(`/api/messages?sender_id=${encodeURIComponent(senderId)}`, {
-      method: 'POST',
-      body: JSON.stringify({ receiver_id: receiverId, content }),
     }),
 }
