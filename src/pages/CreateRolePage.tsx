@@ -76,21 +76,23 @@ export default function CreateRolePage() {
   )
 
   return (
-    <ChatLayout
-      header={header}
-      footer={footer}
-      scrollKey={history.length + (sending ? 1 : 0)}
-    >
-      <div className="px-3 py-4 space-y-3">
-        {history.map((m, i) => (
-          <ChatBubble key={i} role={m.role} content={m.content} />
-        ))}
-        {sending && (
-          <div className="flex justify-start">
-            <TypingIndicator inBubble />
-          </div>
-        )}
-      </div>
-    </ChatLayout>
+    <div className="fixed inset-0 z-40 mx-auto max-w-[480px]">
+      <ChatLayout
+        header={header}
+        footer={footer}
+        scrollKey={history.length + (sending ? 1 : 0)}
+      >
+        <div className="px-3 py-4 space-y-3">
+          {history.map((m, i) => (
+            <ChatBubble key={i} role={m.role} content={m.content} />
+          ))}
+          {sending && (
+            <div className="flex justify-start">
+              <TypingIndicator inBubble />
+            </div>
+          )}
+        </div>
+      </ChatLayout>
+    </div>
   )
 }
