@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ChatLayout, ChatBubble, ChatInput, TypingIndicator, ChevronLeft } from '@akong/core'
 import { toast } from 'sonner'
@@ -18,6 +18,11 @@ export default function CreateRolePage() {
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [createdId, setCreatedId] = useState<string | null>(null)
+
+  useEffect(() => {
+    document.body.classList.add('no-body-scroll')
+    return () => document.body.classList.remove('no-body-scroll')
+  }, [])
 
   const send = async (text: string) => {
     if (!text.trim() || sending) return
