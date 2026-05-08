@@ -73,7 +73,7 @@ export default function HomePage() {
           <div className="text-center text-sm text-[var(--ak-fg-tertiary)] py-12">
             {tab === '关注' && '还没关注任何人 · 去推荐看看'}
             {tab === '同城' && '还没有同城内容'}
-            {tab === '推荐' && '还没有虚拟角色 · 跟角色助手聊几句造一个'}
+            {tab === '推荐' && '还没有虚拟角色 · 去消息里找阿空小造聊几句造一个'}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2.5">

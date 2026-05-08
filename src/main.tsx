@@ -7,8 +7,8 @@ import './index.css'
 
 import HomePage from './pages/HomePage'
 import MarketPage from './pages/MarketPage'
-import CreateRolePage from './pages/CreateRolePage'
 import MessagesPage from './pages/MessagesPage'
+import ConversationDetailPage from './pages/ConversationDetailPage'
 import MePage from './pages/MePage'
 import ServiceDetailPage from './pages/ServiceDetailPage'
 import RoleDetailPage from './pages/RoleDetailPage'
@@ -40,8 +40,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/market" element={<MarketPage />} />
-            <Route path="/create" element={<CreateRolePage />} />
             <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/messages/:agentId" element={<ConversationDetailPage />} />
             <Route path="/me" element={<MePage />} />
             <Route path="/service/:id" element={<ServiceDetailPage />} />
             <Route path="/role/:id" element={<RoleDetailPage />} />
