@@ -21,16 +21,19 @@ npm run dev
 
 ## 路由
 
+(REQ-004 · 5-9 老板拍 v3) `/` 默认入口 = 跟阿空小造的对话页 · 砍中间 ➕ 创建按钮 · 其他页全留。
+
 | path | page | 说明 |
 |---|---|---|
-| / | HomePage | 内容 feed (笔记瀑布流) |
-| /market | MarketPage | 市集 (服务商品瀑布流) |
-| /create | CreateRolePage | 跟开店小助手聊天造角色 |
-| /messages | MessagesPage | 消息 |
-| /me | MePage | 我 (当前角色主页 + 切换) |
-| /note/:id | NoteDetailPage | 笔记详情 |
-| /service/:id?role= | ServiceDetailPage | 商品详情 + 下单 |
-| /role/:id | RoleDetailPage | 角色店铺主页 |
+| `/` | ChatPage | **默认** · 跟阿空小造 (ag_builtin_meta-xiaozao) 多轮对话造 agent |
+| `/home` | HomePage | 内容 feed (老首页 · 不在 BottomNav · 直链可达) |
+| `/market` | MarketPage | 市集 (服务商品瀑布流) |
+| `/messages` | MessagesPage | 消息 (BottomNav tab) |
+| `/me` | MePage | 我 (当前用户主页) |
+| `/service/:id?role=` | ServiceDetailPage | 商品详情 + 下单 |
+| `/role/:id` | RoleDetailPage | 角色店铺主页 |
+
+BottomNav 4 tab: 对话(/) · 市集(/market) · 消息(/messages) · 我(/me) — 中间 ➕ 创建按钮已砍。
 
 ## 域名
 
@@ -42,11 +45,11 @@ npm run dev
 - 后端 (cast-api): https://api.cast.agentaily.com
 - agent runtime (cast-agents): https://api.cast-agents.agentaily.com
 
-## /create 多轮对话
+## ChatPage 多轮对话
 
-`/create` 跟"角色助手 (阿空小造)"聊天 · 真造 agent · 跟 Claude Code 风一样**连续多轮**:
+`/` 默认就是 ChatPage · 跟阿空小造 (`ag_builtin_meta-xiaozao`) 多轮对话造 agent · 跟 Claude Code 风一样**连续多轮**:
 
-- session_id 进页时自动生成 (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage + url query (`?s=...`) 双持久化 · 刷新页面不丢
+- session_id 进页时自动生成 (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage(`cast_session`) + url query (`?s=...`) 双持久化 · 刷新页面不丢
 - 用户输入 → POST `/api/agent/run` (sync · 同 session_id) · cast-agents 内部 RdsSession 自动续上下文 · 前端不用拼 history
 - 只渲染 LLM 的 `final_text` 单条气泡 (不展示中间 system / tool_use turns)
 - 头部"重开"按钮: 清 session + 生新 session_id + 清 UI history · 老 session 留在 cast-api DB 做审计

@@ -48,14 +48,14 @@ export default function MePage() {
 
       <section className="px-5 pb-3 flex items-center justify-between">
         <h2 className="text-[15px] font-semibold tracking-tight">我的艺人</h2>
-        <Button variant="secondary" size="sm" onPress={() => navigate('/create')}>造一个</Button>
+        <Button variant="secondary" size="sm" onPress={() => navigate('/')}>找阿空小造</Button>
       </section>
 
       <div className="px-3 pb-6">
         {roles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
-            <p className="text-[14px] text-[var(--ak-fg-secondary)] leading-relaxed mb-5">还没有艺人 · 跟阿空小造聊几句造一个</p>
-            <Button variant="primary" size="lg" onPress={() => navigate('/create')}>去造艺人</Button>
+            <p className="text-[14px] text-[var(--ak-fg-secondary)] leading-relaxed mb-5">还没有艺人 · 去对话页跟阿空小造聊几句造一个</p>
+            <Button variant="primary" size="lg" onPress={() => navigate('/')}>找阿空小造</Button>
           </div>
         ) : (
           <div className="space-y-2.5">

@@ -22,7 +22,7 @@ cast-api 内部还存 `chat_messages` (按 session_id 分桶) · 由 cast-agents
 
 ### cast-agents (`https://api.cast-agents.agentaily.com`)
 
-LLM agent runtime · 给 /create + 未来私信对话提供 sync 推理入口。
+LLM agent runtime · 给 ChatPage (`/` 默认入口 · REQ-004) + 未来其他 agent 私信对话提供 sync 推理入口。
 
 | endpoint | method | 用途 |
 |---|---|---|
@@ -40,7 +40,7 @@ LLM agent runtime · 给 /create + 未来私信对话提供 sync 推理入口。
 }
 ```
 
-- `session_id` 由 cast-app **前端自生** (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage(`cast_create_session`) + url query (`?s=...`) 双持久化 · 跨刷新不丢
+- `session_id` 由 cast-app **前端自生** (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage(`cast_session`) + url query (`?s=...`) 双持久化 · 跨刷新不丢
 - 同 `session_id` 反复 POST · cast-agents 内部走 `RdsSession.load(session_id)` 自动续 history
 - `max_turns` 默认 10 · 防 LLM 无限自循环
 
