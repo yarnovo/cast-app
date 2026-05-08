@@ -37,6 +37,24 @@ npm run dev
 公司官方主域 = **agentaily.com** (aliyun 注册 · 2027-03-20 到期)。所有子域挂在此。
 
 - 开发: localhost:5174
-- 上线: https://m.cast.agentaily.com (已上)
-- 后端: https://api.cast.agentaily.com (待部署)
-- agents: https://agents.api.cast.agentaily.com (待部署)
+- staging: https://staging.m.cast.agentaily.com (push develop 自动 deploy)
+- prod: https://m.cast.agentaily.com (push main 自动 deploy)
+- 后端 (cast-api): https://api.cast.agentaily.com
+- agent runtime (cast-agents): https://api.cast-agents.agentaily.com
+
+## /create 多轮对话
+
+`/create` 跟"角色助手 (阿空小造)"聊天 · 真造 agent · 跟 Claude Code 风一样**连续多轮**:
+
+- session_id 进页时自动生成 (格式 `s_` + 12 位 [a-z0-9]) · sessionStorage + url query (`?s=...`) 双持久化 · 刷新页面不丢
+- 用户输入 → POST `/api/agent/run` (sync · 同 session_id) · cast-agents 内部 RdsSession 自动续上下文 · 前端不用拼 history
+- 只渲染 LLM 的 `final_text` 单条气泡 (不展示中间 system / tool_use turns)
+- 头部"重开"按钮: 清 session + 生新 session_id + 清 UI history · 老 session 留在 cast-api DB 做审计
+- 上游契约见 [CONTRACTS.md](./CONTRACTS.md)
+
+## 测
+
+```bash
+npm run test:e2e          # 单 chromium · 跑 e2e/*.spec.ts (含多轮 spec) · ≤ 60s/case
+npm run test:e2e:ui       # ui mode 调试用
+```
