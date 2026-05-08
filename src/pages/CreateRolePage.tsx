@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Button, ChatLayout, ChatBubble, ChatInput, TypingIndicator, ChevronLeft } from '@akong/core'
 import { toast } from 'sonner'
-import { api, type Trigger } from '@/api/client'
-import { getOwner } from '@/auth'
+import { api } from '@/api/client'
 
 const META_AGENT_ID = 'ag_builtin_meta-xiaozao'
+const SESSION_KEY = 'cast_create_session'
+const SESSION_QS = 's'
+const MAX_TURNS = 10
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 const INTRO: Msg = {
@@ -13,9 +15,43 @@ const INTRO: Msg = {
   content: '你好 · 我是角色助手。\n你想造一个啥样的虚拟角色？她 / 他擅长什么 · 想接什么样的活？',
 }
 
+/** session_id 前端自生 · `s_` + 12 位 [a-z0-9] · 不引 nanoid 依赖 */
+function newSessionId(): string {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  let s = 's_'
+  const rnd = new Uint8Array(12)
+  crypto.getRandomValues(rnd)
+  for (let i = 0; i < 12; i++) s += alphabet[rnd[i] % alphabet.length]
+  return s
+}
+
+/**
+ * 取 / 建 session_id · 优先级:
+ *   url query `?s=...` > sessionStorage > 新生
+ * 持久化策略: 取到 / 新生后立刻同步到 sessionStorage + url (replaceState · 不污染 history)
+ * sessionStorage = 同 tab 刷新不丢 · url query = 复制粘贴 / 跳转保留
+ */
+function ensureSessionId(searchParams: URLSearchParams): string {
+  const fromUrl = searchParams.get(SESSION_QS)
+  const fromStorage = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(SESSION_KEY) : null
+  const sid = fromUrl || fromStorage || newSessionId()
+  try {
+    sessionStorage.setItem(SESSION_KEY, sid)
+  } catch {
+    // storage 可能被禁 · 忽略
+  }
+  if (fromUrl !== sid && typeof window !== 'undefined') {
+    const url = new URL(window.location.href)
+    url.searchParams.set(SESSION_QS, sid)
+    window.history.replaceState({}, '', url.toString())
+  }
+  return sid
+}
+
 export default function CreateRolePage() {
   const navigate = useNavigate()
-  const owner = getOwner()
+  const [searchParams] = useSearchParams()
+  const [sessionId, setSessionId] = useState<string>(() => ensureSessionId(searchParams))
   const [history, setHistory] = useState<Msg[]>([INTRO])
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
@@ -33,17 +69,14 @@ export default function CreateRolePage() {
     setHistory(newHistory)
     setDraft('')
     try {
-      const trigger: Trigger = {
-        kind: 'human-dm',
-        payload: {
-          from: owner,
-          history: history.filter((m) => m !== INTRO).slice(-20),
-          message: text,
-        },
-      }
-      const r = await api.agentTick(META_AGENT_ID, trigger)
-      const reply =
-        r.messages.filter((m) => m.role === 'assistant').slice(-1)[0]?.content || '...'
+      const r = await api.agentRun({
+        agentId: META_AGENT_ID,
+        sessionId,
+        userMessage: text,
+        maxTurns: MAX_TURNS,
+      })
+      // 跟 Claude Code 风一样: 只渲染 final_text · 不展示中间 system / tool_use turns
+      const reply = (r.final_text || '').trim() || '...'
       setHistory([...newHistory, { role: 'assistant', content: reply }])
       const createAction = r.actions.find((a) => a.tool_id === 'cast.create_agent')
       const createdAgentId =
@@ -60,6 +93,32 @@ export default function CreateRolePage() {
     }
   }
 
+  /**
+   * 重新开始 · 清 session + 重生 session_id + 清 UI history。
+   * 不调上游 DELETE chat_messages — 老 session 留在 cast-api DB 做审计 · 用新 session_id 起新对话即可。
+   */
+  const restart = () => {
+    if (sending) return
+    const sid = newSessionId()
+    try {
+      sessionStorage.setItem(SESSION_KEY, sid)
+    } catch {
+      // ignore
+    }
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      url.searchParams.set(SESSION_QS, sid)
+      window.history.replaceState({}, '', url.toString())
+    }
+    setSessionId(sid)
+    setHistory([INTRO])
+    setCreatedId(null)
+    setDraft('')
+    toast.success('已重新开始')
+  }
+
+  const sessionShort = useMemo(() => sessionId.slice(0, 8), [sessionId])
+
   const header = (
     <header
       data-testid="create-role-header"
@@ -68,8 +127,19 @@ export default function CreateRolePage() {
       <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
       <div className="flex-1">
         <div className="font-semibold leading-tight">角色助手</div>
-        <div className="text-[11px] text-[var(--ak-fg-secondary)]">聊几句帮你造虚拟角色</div>
+        <div className="text-[11px] text-[var(--ak-fg-secondary)]" data-testid="session-indicator">
+          会话 {sessionShort}
+        </div>
       </div>
+      <button
+        data-testid="restart-btn"
+        onClick={restart}
+        aria-label="重新开始"
+        disabled={sending}
+        className="px-3 h-9 mr-1 text-[13px] font-medium text-[var(--ak-fg-secondary)] hover:text-[var(--ak-fg)] disabled:opacity-50 rounded-md"
+      >
+        重开
+      </button>
     </header>
   )
 

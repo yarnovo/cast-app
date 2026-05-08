@@ -73,6 +73,33 @@ export type TickResult = {
   stopped: boolean
 }
 
+/**
+ * Agent run · 多轮 session-持久化 sync API (架构 §2.7)
+ *
+ * cast-agents `POST /api/agent/run` 内部 RdsSession.load(session_id) → 拼 history → LLM →
+ * append turn → save · 前端只关心 final_text 渲染。
+ */
+export type RunMessage = {
+  role: 'system' | 'user' | 'assistant' | 'tool'
+  content: unknown
+}
+
+export type RunUsage = {
+  input_tokens?: number
+  output_tokens?: number
+  cache_creation_input_tokens?: number
+  cache_read_input_tokens?: number
+}
+
+export type RunResult = {
+  messages: RunMessage[]
+  final_text: string
+  stop_reason: 'end_turn' | 'max_turns' | 'harness_stop'
+  turns_used: number
+  usage: RunUsage
+  actions: TickAction[]
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const r = await fetch(`${BASE}${path}`, {
     ...init,
@@ -125,10 +152,28 @@ export const api = {
   payOrder: (orderId: string) => req<OrderPublic>(`/api/orders/${orderId}/pay`, { method: 'POST' }),
   myOrders: (userId: string) => req<OrderPublic[]>(`/api/orders/mine?user_id=${userId}`),
 
-  // agent runtime tick · 通用 agent 入口 (架构 §2.6)
+  // agent runtime tick · 通用 agent 入口 · 老单轮路径 (架构 §2.6 · 兼容保留)
   agentTick: (agentId: string, trigger: Trigger) =>
     agentReq<TickResult>('/api/agent/tick', {
       method: 'POST',
       body: JSON.stringify({ agent_id: agentId, trigger }),
+    }),
+
+  // agent run · sync 多轮 session-持久化 (架构 §2.7)
+  // session_id 前端自生 (eg. `s_${nanoid(12)}`) · 同 session_id 反复 POST · cast-agents 内部续上
+  agentRun: (params: {
+    agentId: string
+    sessionId: string
+    userMessage: string
+    maxTurns?: number
+  }) =>
+    agentReq<RunResult>('/api/agent/run', {
+      method: 'POST',
+      body: JSON.stringify({
+        agent_id: params.agentId,
+        session_id: params.sessionId,
+        user_message: params.userMessage,
+        max_turns: params.maxTurns ?? 10,
+      }),
     }),
 }
