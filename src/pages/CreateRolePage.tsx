@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, ChatLayout, ChatBubble, ChatInput, TypingIndicator, ChevronLeft } from '@akong/core'
 import { toast } from 'sonner'
-import { api } from '@/api/client'
+import { api, type Trigger } from '@/api/client'
 import { getOwner } from '@/auth'
+
+const META_AGENT_ID = 'ag_builtin_meta-xiaozao'
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 const INTRO: Msg = {
@@ -31,10 +33,23 @@ export default function CreateRolePage() {
     setHistory(newHistory)
     setDraft('')
     try {
-      const r = await api.metaChat(owner, history.filter((m) => m !== INTRO).slice(-20), text)
-      setHistory([...newHistory, { role: 'assistant', content: r.reply }])
-      if (r.created_agent_id) {
-        setCreatedId(r.created_agent_id)
+      const trigger: Trigger = {
+        kind: 'human-dm',
+        payload: {
+          from: owner,
+          history: history.filter((m) => m !== INTRO).slice(-20),
+          message: text,
+        },
+      }
+      const r = await api.agentTick(META_AGENT_ID, trigger)
+      const reply =
+        r.messages.filter((m) => m.role === 'assistant').slice(-1)[0]?.content || '...'
+      setHistory([...newHistory, { role: 'assistant', content: reply }])
+      const createAction = r.actions.find((a) => a.tool_id === 'cast.create_agent')
+      const createdAgentId =
+        (createAction?.result as { agent_id?: string } | null)?.agent_id || null
+      if (createdAgentId) {
+        setCreatedId(createdAgentId)
         toast.success('艺人创建成功')
       }
     } catch (e) {

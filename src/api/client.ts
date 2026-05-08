@@ -55,10 +55,22 @@ export type OrderPublic = {
   delivered_at: string | null
 }
 
-export type MetaChatResponse = {
-  reply: string
-  created_agent_id: string | null
-  done: boolean
+export type Trigger = {
+  kind: 'cron' | 'event' | 'human-dm' | 'manual'
+  payload?: Record<string, unknown>
+}
+
+export type TickAction = {
+  tool_id: string
+  args: Record<string, unknown>
+  result: unknown
+}
+
+export type TickResult = {
+  actions: TickAction[]
+  messages: { role: string; content: string }[]
+  next_wakeup: string | null
+  stopped: boolean
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -113,10 +125,10 @@ export const api = {
   payOrder: (orderId: string) => req<OrderPublic>(`/api/orders/${orderId}/pay`, { method: 'POST' }),
   myOrders: (userId: string) => req<OrderPublic[]>(`/api/orders/mine?user_id=${userId}`),
 
-  // 阿空小造 · 跟用户聊几句帮造虚拟角色
-  metaChat: (ownerId: string, history: { role: string; content: string }[], message: string) =>
-    agentReq<MetaChatResponse>('/api/meta-agent/chat', {
+  // agent runtime tick · 通用 agent 入口 (架构 §2.6)
+  agentTick: (agentId: string, trigger: Trigger) =>
+    agentReq<TickResult>('/api/agent/tick', {
       method: 'POST',
-      body: JSON.stringify({ owner_id: ownerId, history, message }),
+      body: JSON.stringify({ agent_id: agentId, trigger }),
     }),
 }
