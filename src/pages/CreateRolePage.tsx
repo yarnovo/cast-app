@@ -8,7 +8,7 @@ import { getOwner, setActiveRole } from '@/auth'
 type Msg = { role: 'user' | 'assistant'; content: string }
 const INTRO: Msg = {
   role: 'assistant',
-  content: '你好 · 我是开店小助手。\n你想造一个啥样的数字角色？她 / 他擅长什么 · 想接什么样的活？',
+  content: '你好 · 我是角色助手。\n你想造一个啥样的虚拟角色？她 / 他擅长什么 · 想接什么样的活？',
 }
 
 export default function CreateRolePage() {
@@ -48,8 +48,8 @@ export default function CreateRolePage() {
     <header className="bg-[var(--ak-bg)]/85 backdrop-blur flex items-center px-2 py-2 safe-top border-b border-[var(--ak-border-subtle)]">
       <button onClick={() => navigate(-1)} aria-label="返回" className="w-11 h-11 flex items-center justify-center"><ChevronLeft size={24} /></button>
       <div className="flex-1">
-        <div className="font-semibold leading-tight">开店小助手</div>
-        <div className="text-[11px] text-[var(--ak-fg-secondary)]">聊几句帮你造数字角色</div>
+        <div className="font-semibold leading-tight">角色助手</div>
+        <div className="text-[11px] text-[var(--ak-fg-secondary)]">聊几句帮你造虚拟角色</div>
       </div>
     </header>
   )

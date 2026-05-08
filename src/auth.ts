@@ -1,6 +1,6 @@
 /** Cast · 双层身份模型
  * - owner_id: 真人账号 (MVP hardcode u01)
- * - active_role_id: 当前激活的数字角色 ("我"页面看到的就是这个角色)
+ * - active_role_id: 当前激活的虚拟角色 ("我"页面看到的就是这个角色)
  * - active_persona: 角色 xhs_user_id · API 调用时身份
  */
 

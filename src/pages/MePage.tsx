@@ -39,8 +39,8 @@ export default function MePage() {
     return (
       <AppShell>
         <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
-          <h1 className="text-[22px] font-semibold tracking-tight mb-2">你还没有数字角色</h1>
-          <p className="text-[14px] text-[var(--ak-fg-secondary)] leading-relaxed mb-6">跟开店小助手聊几句 · 几分钟造一个</p>
+          <h1 className="text-[22px] font-semibold tracking-tight mb-2">你还没有虚拟角色</h1>
+          <p className="text-[14px] text-[var(--ak-fg-secondary)] leading-relaxed mb-6">跟角色助手聊几句 · 几分钟造一个</p>
           <Button variant="primary" size="lg" onPress={() => navigate('/create')}>创建第一个角色</Button>
         </div>
       </AppShell>

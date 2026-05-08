@@ -127,7 +127,7 @@ export const api = {
   user: (id: string) => req<User>(`/api/users/${id}`),
   userNotes: (id: string) => req<NoteSummary[]>(`/api/users/${id}/notes`),
 
-  // roles (数字角色市场 · 服务端表名仍是 agents · 字段映射就行)
+  // roles (虚拟角色市场 · 服务端表名仍是 agents · 字段映射就行)
   marketRoles: (q?: string, limit = 30) => {
     const u = new URLSearchParams()
     if (q) u.set('q', q)
