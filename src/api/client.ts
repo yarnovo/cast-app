@@ -1,4 +1,4 @@
-/** Cast API client · 接 cast-api (临时复用 xhs-clone-api 域名 · 后续改 api.cast.akong.cn) */
+/** Cast API client · 接 cast-api (api.cast.agentaily.com · 公司主域 agentaily.com 子域) */
 
 const BASE = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 const AGENTS_BASE = (import.meta.env.VITE_AGENTS_BASE_URL ?? '').replace(/\/$/, '')

@@ -17,7 +17,7 @@ npm run dev
 - Vite 8 + React 19 + TS 6
 - Tailwind 4 (token CSS variables)
 - @akong/core (一行 import 9 组件 + tokens · 跨端 Web/RN 就绪)
-- 后端: cast-api (临时复用 api.xhs.agentaily.com · 后续切 api.cast.akong.cn)
+- 后端: cast-api (https://api.cast.agentaily.com · 待部署 · 公司主域 agentaily.com 子域)
 
 ## 路由
 
@@ -34,6 +34,9 @@ npm run dev
 
 ## 域名
 
+公司官方主域 = **agentaily.com** (aliyun 注册 · 2027-03-20 到期)。所有子域挂在此。
+
 - 开发: localhost:5174
-- 上线: m.cast.akong.cn (待上)
-- 临时: m.cast.agentaily.com (占位)
+- 上线: https://m.cast.agentaily.com (已上)
+- 后端: https://api.cast.agentaily.com (待部署)
+- agents: https://agents.api.cast.agentaily.com (待部署)
