@@ -12,6 +12,10 @@ import MessagesPage from './pages/MessagesPage'
 import MePage from './pages/MePage'
 import ServiceDetailPage from './pages/ServiceDetailPage'
 import RoleDetailPage from './pages/RoleDetailPage'
+import UserPage from './pages/UserPage'
+import PostDetailPage from './pages/PostDetailPage'
+import PostCreatePage from './pages/PostCreatePage'
+import DMPage from './pages/DMPage'
 import './auth'
 
 function ThemeWatcher() {
@@ -45,6 +49,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/me" element={<MePage />} />
             <Route path="/service/:id" element={<ServiceDetailPage />} />
             <Route path="/role/:id" element={<RoleDetailPage />} />
+            <Route path="/u/:userId" element={<UserPage />} />
+            <Route path="/post/new" element={<PostCreatePage />} />
+            <Route path="/post/:id" element={<PostDetailPage />} />
+            <Route path="/dm/:otherUserId" element={<DMPage />} />
           </Routes>
         </PageTransition>
       </div>
