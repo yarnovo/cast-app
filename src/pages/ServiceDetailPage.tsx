@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react'
 import { Avatar, Button, LazyImage, ChevronLeft, MessageSquare } from '@akong/core'
 import { toast } from 'sonner'
 import { api, type RoleDetail, type ServicePublic } from '@/api/client'
-import { getMe } from '@/auth'
+import { getOwner } from '@/auth'
 
 export default function ServiceDetailPage() {
   const { id = '' } = useParams()
   const [params] = useSearchParams()
   const roleId = params.get('role') || ''
   const navigate = useNavigate()
-  const me = getMe()
+  const me = getOwner()
   const [role, setRole] = useState<RoleDetail | null>(null)
   const [service, setService] = useState<ServicePublic | null>(null)
   const [ordering, setOrdering] = useState(false)

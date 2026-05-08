@@ -2,12 +2,12 @@ import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Avatar, ServiceCard, Button, ChevronLeft } from '@akong/core'
 import { api, type RoleDetail } from '@/api/client'
-import { getMe } from '@/auth'
+import { getOwner } from '@/auth'
 
 export default function RoleDetailPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
-  const me = getMe()
+  const me = getOwner()
   const [role, setRole] = useState<RoleDetail | null>(null)
 
   useEffect(() => { api.roleDetail(id).then(setRole).catch(() => {}) }, [id])
