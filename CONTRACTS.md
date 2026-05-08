@@ -2,23 +2,32 @@
 
 cast-app 仓的对外契约 · 申明上下游依赖 + 接口形态。改这些字段记得连同上下游一起跟改。
 
-## 形态 (REQ-003 · 5-9 老板拍 单页对话化)
-
-整个 cast-app = 1 个 ChatPage (路由 `/`) · 默认接 `ag_builtin_meta-xiaozao`。
-
-前端**不直调 cast-api 业务 endpoint** (用户/角色/订单/服务包) · 所有数据查询 / 修改通过跟 meta agent 对话触发对应 tool · meta 内部调 cast-api。
-
-→ cast-app 的前端契约只剩一条: 调 cast-agents `POST /api/agent/run`。
-
 ## 上游 (cast-app 调的服务)
 
-### cast-agents (`https://api.cast-agents.agentaily.com`)
+### cast-api (`https://api.cast.agentaily.com` · 主域 agentaily.com 子域)
 
-LLM agent runtime · 给 ChatPage 多轮对话提供 sync 推理入口。
+业务数据 (用户 / 角色 / 服务包 / 订单)。
 
 | endpoint | method | 用途 |
 |---|---|---|
-| `/api/agent/run` | POST | sync 多轮 · session 持久化由 cast-agents 内部 RdsSession 自管 |
+| `/api/users/:id` | GET | 用户公开字段 |
+| `/api/agents` | GET | 角色 (虚拟艺人) 市集列表 |
+| `/api/agents/:id` | GET | 角色详情 + services |
+| `/api/agents/mine` | GET | 当前 owner 的角色 |
+| `/api/orders` | POST | 下单 |
+| `/api/orders/:id/pay` | POST | 支付 |
+| `/api/orders/mine` | GET | 我的订单 |
+
+cast-api 内部还存 `chat_messages` (按 session_id 分桶) · 由 cast-agents 的 RdsSession 负责读写 · cast-app **不直接调** chat_messages CRUD。
+
+### cast-agents (`https://api.cast-agents.agentaily.com`)
+
+LLM agent runtime · 给 ChatPage (`/` 默认入口 · REQ-004) + 未来其他 agent 私信对话提供 sync 推理入口。
+
+| endpoint | method | 用途 |
+|---|---|---|
+| `/api/agent/tick` | POST | **老路径** · 单轮 (前端拼 history) · 兼容保留 · 新代码不要再用 |
+| `/api/agent/run` | POST | **当前主路径** · sync 多轮 · session 持久化由 cast-agents 内部 RdsSession 自管 |
 
 #### `/api/agent/run` request
 
@@ -52,13 +61,7 @@ cast-app 渲染策略 (跟 Claude Code 风一样):
 
 - 只渲染 `final_text` · 1 条 assistant 气泡
 - 不展示中间 system / tool_use turns
-- `actions` 用来识别副作用 (eg. `cast.create_agent` → toast 提示"艺人 ag_xxx 创建成功")
-
-### cast-api (`https://api.cast.agentaily.com`) — 间接依赖
-
-cast-app **不直接调** · 通过 meta agent 的 tool 间接消费。后续要支持的"管理"动作 (list_agents · update_agent · query_posts ...) 由 meta yaml 加 tool · cast-app 不改代码。
-
-cast-api 内部存 `chat_messages` (按 session_id 分桶) · 由 cast-agents 的 RdsSession 负责读写 · cast-app 也不直接调 chat_messages CRUD。
+- `actions` 用来识别副作用 (eg. `cast.create_agent` → 弹"去看角色"按钮)
 
 ## 下游 (调 cast-app 的客户端)
 
@@ -75,6 +78,4 @@ CI 见 `.github/workflows/deploy.yml`。
 
 ## 改这份契约
 
-cast-app maintainer 改 `/api/agent/run` 调用形态前要先跟 cast-agents maintainer 同步 · 同 PR 改两边或先改上游再改下游 · 不能 cast-app 单边改。
-
-后续要给前端加新交互 (例: 直接渲染 agent 列表 · 直接显示 post 详情) 之前先问老板: 默认全部走对话 · 加 UI 是反 5-9 拍。
+cast-app maintainer 改 `/api/agent/run` 形态前要先跟 cast-agents maintainer 同步 · 同 PR 改两边或先改上游再改下游 · 不能 cast-app 单边改。

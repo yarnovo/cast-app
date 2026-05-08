@@ -2,27 +2,26 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Avatar, ChatLayout, ChatBubble, ChatInput, TypingIndicator } from '@akong/core'
 import { toast } from 'sonner'
+import AppShell from '@/components/AppShell'
 import { api } from '@/api/client'
 import { getOwner } from '@/auth'
 
 /**
- * cast-app · 单页对话 (REQ-003 · 5-9 老板拍 · ChatGPT / Claude Code CLI 风)
+ * cast-app · 默认入口 ChatPage (REQ-004 · 5-9 老板拍 v3)
  *
- * 整个 app 就一页 · 一打开 = 跟阿空小造的对话。后续所有"管理"动作 (查/改 agent · 看 post 等)
- * 都通过跟 meta 聊天触发对应 tool · UI 不再有 list/feed/profile 等页面。
+ * `/` 路由直接跳跟阿空小造的对话页 (开 app 即对话 · 不再看 feed)。
+ * 但**保留** BottomNav + 其他页 (HomePage feed / MarketPage / MessagesPage / MePage) ·
+ * 用户可以通过 BottomNav 切到其他 tab。
  *
- * 极简结构:
- *   - top header: meta 头像 + 名字 + 重开 + 用户头像
- *   - main: 气泡列表
- *   - bottom: ChatInput
- *
- * 多轮 session: 跟 P0d / REQ-001 同 pattern · sessionStorage(`cast_session`) + url query (?s=)
- *               双持久化 · POST /api/agent/run 同 session_id 反复 · cast-agents 内部续上下文。
+ * 跟之前砍版的 CreateRolePage 同 multi-turn session 持久化逻辑:
+ *   - sessionStorage(`cast_session`) + url query (?s=) 双持久化
+ *   - 同 sid 反复 POST /api/agent/run · cast-agents 内部 RdsSession 续上下文
+ *   - 头部"重开"按钮: 清 session + 生新 sid + 清 history
  */
 
 const META_AGENT_ID = 'ag_builtin_meta-xiaozao'
 const META_NAME = '阿空小造'
-const SESSION_KEY = 'cast_session' // 单会话 app · 用顶层 key 不带 (agent, user) 后缀
+const SESSION_KEY = 'cast_session'
 const SESSION_QS = 's'
 const MAX_TURNS = 10
 
@@ -71,6 +70,7 @@ export default function ChatPage() {
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
 
+  // 防 body 双滚动条 (chat 区自管 scroll)
   useEffect(() => {
     document.body.classList.add('no-body-scroll')
     return () => document.body.classList.remove('no-body-scroll')
@@ -169,26 +169,30 @@ export default function ChatPage() {
     </div>
   )
 
+  // 注: ChatLayout 自身是 flex-col 100% 高度 · 外层固定到视口减去 BottomNav (h-14 = 56px)。
+  // 用 fixed 而非 inset-0 直接铺 · 避免覆盖 BottomNav。
   return (
-    <div className="fixed inset-0 z-40 mx-auto max-w-[480px]">
-      <ChatLayout
-        header={header}
-        footer={footer}
-        scrollKey={history.length + (sending ? 1 : 0)}
-      >
-        <div className="px-3 py-4 space-y-3">
-          {history.map((m, i) => (
-            <div key={i} data-testid={`bubble-${i}`}>
-              <ChatBubble role={m.role} content={m.content} />
-            </div>
-          ))}
-          {sending && (
-            <div className="flex justify-start">
-              <TypingIndicator inBubble />
-            </div>
-          )}
-        </div>
-      </ChatLayout>
-    </div>
+    <AppShell>
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] h-[calc(100vh-3.5rem)] z-30">
+        <ChatLayout
+          header={header}
+          footer={footer}
+          scrollKey={history.length + (sending ? 1 : 0)}
+        >
+          <div className="px-3 py-4 space-y-3">
+            {history.map((m, i) => (
+              <div key={i} data-testid={`bubble-${i}`}>
+                <ChatBubble role={m.role} content={m.content} />
+              </div>
+            ))}
+            {sending && (
+              <div className="flex justify-start">
+                <TypingIndicator inBubble />
+              </div>
+            )}
+          </div>
+        </ChatLayout>
+      </div>
+    </AppShell>
   )
 }
